@@ -6,17 +6,13 @@ library(gridExtra)
 
 # Following a different tutorial (https://gist.github.com/slavailn/dcff753cc32fd9e053590308c831b057)
 rm(list=ls())
+#choose input file
 input="winter"
 #load("GO.DF.kd490winter.Rdata")
 #load("GO.DF.PARsummer.Rdata")
 #load("GO.DF.Salinity.Rdata")
 #load("GO.DF.kd490spring.Rdata")
 load("GO.DF.Winter.Rdata")
-
-#save(hit.DF.SAMPLES,file="hit.DF.Rdata")
-
-#First set create a gene2Go table
-
 
 PID.u<-unique(GO.DF$proteinId)
 Genes2GO.M<-matrix(ncol=2,nrow=length(PID.u))
@@ -57,9 +53,7 @@ resultTopGO.elim.CC <- runTest(GOdata.CC, algorithm = "elim", statistic = "Fishe
 resultTopGO.elim.BP <- runTest(GOdata.BP, algorithm = "elim", statistic = "Fisher" )
 
 
-#PC1.K4
 
-#any
 allRes.BP <- GenTable(GOdata.BP, elimKS = resultTopGO.elim.BP,
                               orderBy = "elimKS", 
                               topNodes = 356)
@@ -75,9 +69,6 @@ allRes.CC <- GenTable(GOdata.CC, elimKS = resultTopGO.elim.CC,
 
 
 #Writing topGO result tables to file
-#PC1.K4
-#write.table(allRes, file = paste0("topGO_results_",input,".all.txt"), sep = "\t", quote = F, col.names = T, row.names = F)
-
 write.table(allRes.BP, file = paste0("topGO_results_",input,".BP.txt"), sep = "\t", quote = F, col.names = T, row.names = F)
 write.table(allRes.MF, file = paste0("topGO_results_",input,".MF.txt"), sep = "\t", quote = F, col.names = T, row.names = F)
 write.table(allRes.CC, file = paste0("topGO_results_",input,".CC.txt"), sep = "\t", quote = F, col.names = T, row.names = F)
@@ -126,12 +117,11 @@ assign(paste0(input,"_sig.gos"),sig.gos)
 #save(kd490spring_sig.gos,file="kd490spring_sig.gos.cats.Rdata")
 
 
-#barplots ---------------
+#pretty barplots ---------------
 rm(list=ls())
 load("salinity_sig.gos.cats.Rdata")
 
 df.plot.s = salinity_sig.gos[which(salinity_sig.gos$elimKS <= 0.01),]
-# df.plot.s$enrichment = rev(-log10(as.numeric(df.plot.s$elimKS)))
 df.plot.s$enrichment = -log10(as.numeric(df.plot.s$elimKS))
 colnames(df.plot.s)[2] <- "term"
 colnames(df.plot.s)[7] <- "process"
@@ -197,7 +187,6 @@ b=df.plot.p %>%
 load("kd490spring_sig.gos.cats.Rdata")
 
 df.plot.k = kd490spring_sig.gos[which(kd490spring_sig.gos$elimKS <= 0.01),]
-# df.plot.k$enrichment = rev(-log10(as.numeric(df.plot.k$elimKS)))
 df.plot.k$enrichment = -log10(as.numeric(df.plot.k$elimKS))
 
 colnames(df.plot.k)[2] <- "term"
