@@ -15,7 +15,8 @@ library(qqman)
 rm(list=ls())
 
 #use samples with >=7x coverage
-load("lfmm_input.Rdata") #genotypes + environmental data
+load("lfmm_input.Rdata") #genotypes from get_genotype_matrix.R
+load("env_65.Rdata) #environmental data
 
 pairs(Env.dataP)
 
