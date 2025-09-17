@@ -1,0 +1,90 @@
+
+#SNPEff
+library(tidyverse)
+library(stringr)
+library(gridExtra)
+library(ggpubr)
+
+rm(list=ls())
+load("filesepd.Rdata")
+files <- list.files(pattern = "*ANN")
+
+
+#look at impact level ------------------------------
+impactlvl = lapply(filesepd, function(x) subset(x, select = c(1,2,7)))
+testdf=impactlvl[[1]]
+
+lowimp = lapply(impactlvl, function(x) subset(x, column_g == "LOW"))
+modimp = lapply(impactlvl, function(x) subset(x, column_g == "MODERATE"))
+highimp = lapply(impactlvl, function(x) subset(x, column_g == "HIGH"))
+modifimp = lapply(impactlvl, function(x) subset(x, column_g == "MODIFIER"))
+
+#save(list = ls(pattern = '.imp'), file = "snp_impact.RData")
+
+low_by_ind=sapply(lowimp, nrow)
+mod_by_ind=sapply(modimp, nrow)
+high_by_ind=sapply(highimp, nrow)
+modif_by_ind=sapply(modifimp, nrow)
+
+ind_names = files
+
+pops = data.frame("pop"=substr(ind_names,1,2))
+
+Group1<-c("FW","MC","JT","AH","PT","KR","FB")
+Group2<-c("DB","SH","PP","HI","ED","SM","EB")
+Group3<-c("LP","PV","SB","DI","SQ")
+
+GenGroupK3<-1:length(ind_names)
+GenGroupK3[pops$pop%in%Group1]<-"SJF"
+GenGroupK3[pops$pop%in%Group2]<-"WI"
+GenGroupK3[pops$pop%in%Group3]<-"PS"
+
+pops$region = GenGroupK3
+
+
+#try better way
+low_by_ind=data.frame("vars"=sapply(lowimp, nrow),"ind"=ind_names,"pop" = pops$pop,"region" = pops$region)
+mod_by_ind=data.frame("vars"=sapply(modimp, nrow),"ind"=ind_names,"pop" = pops$pop,"region" = pops$region)
+high_by_ind=data.frame("vars"=sapply(highimp, nrow),"ind"=ind_names,"pop" = pops$pop,"region" = pops$region)
+modif_by_ind=data.frame("vars"=sapply(modifimp, nrow),"ind"=ind_names,"pop" = pops$pop,"region" = pops$region)
+
+
+my_comparisons <- list( c("PS", "SJF"), c("PS", "WI"), c("WI", "SJF") )
+
+newlab = c("SPS","WB","SJF")
+low_by_ind$region = factor(low_by_ind$region, levels = c("PS","WI","SJF"))
+mod_by_ind$region = factor(mod_by_ind$region, levels = c("PS","WI","SJF"))
+high_by_ind$region = factor(high_by_ind$region, levels = c("PS","WI","SJF"))
+
+
+a=ggboxplot(low_by_ind, x = "region", y = "vars",fill="region",alpha=0.7)+
+  stat_compare_means(comparisons = my_comparisons)+
+  scale_fill_manual(values = rev(c("hotpink2","orchid4","darkorange3")))+
+  theme(legend.position="none")+
+  ggtitle("low")+
+  scale_x_discrete(labels= newlab)+
+  ylab("number of variants")
+
+b=ggboxplot(mod_by_ind, x = "region", y = "vars",fill="region",alpha=0.7)+
+  stat_compare_means(comparisons = my_comparisons)+
+  scale_fill_manual(values = rev(c("hotpink2","orchid4","darkorange3")))+
+  theme(legend.position="none")+
+  ggtitle("moderate")+
+  scale_x_discrete(labels= newlab)+
+  ylab("number of variants")
+
+c=ggboxplot(high_by_ind, x = "region", y = "vars",fill="region",alpha=0.7)+
+  stat_compare_means(comparisons = my_comparisons)+
+  scale_fill_manual(values = rev(c("hotpink2","orchid4","darkorange3")))+
+  theme(legend.position="none")+
+  ggtitle("high")+
+  scale_x_discrete(labels= newlab)+
+  ylab("number of variants")
+
+
+grid.arrange(a,b,c,nrow=1)
+
+save(mod_by_ind,low_by_ind,high_by_ind,file="variant_by_ind.Rdata")
+
+
+
