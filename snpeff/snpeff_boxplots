@@ -6,8 +6,8 @@ library(gridExtra)
 library(ggpubr)
 
 rm(list=ls())
-load("filesepd.Rdata")
-files <- list.files(pattern = "*ANN")
+load("snpeff_results.Rdata") #list of dataframes, each dataframe is snpeff results an individual
+files <- list.files(pattern = "*ANN") #this just is to get a list of sample names
 
 
 #look at impact level ------------------------------
